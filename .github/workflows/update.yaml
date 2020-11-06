@@ -1,0 +1,31 @@
+name: "Update dependencies"
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cachix/install-nix-action@v9
+      - run: nix run -f ./nix niv -c niv update
+        env:
+          # Workaroundn niv bug
+          GITHUB_PATH: ""
+      - run: git submodule foreach git fetch --tags
+      - name: update controllers/ingress-nginx (as it's tag format differs)
+        run: |
+          ( cd controllers/ingress-nginx ; git checkout $(git rev-list --tags="controller-*" --max-count=1) )
+      - name: update other controllers
+        run: |
+          for i in local-path-provisioner minio-operator prometheus-operator; do 
+            ( cd controllers/$i ; git checkout $(git rev-list --tags="v*" --max-count=1) )
+          done
+      - uses: peter-evans/create-pull-request@v2.8.0
+        with:
+          token: ${{ secrets.PAT }} # needed so that this triggers further flows. not ideal:
+          commit-message: "chore: update dependencies"
+          title: "chore: update dependencies"
+          reviewers: "arianvp"
+          branch: "chore/update-dependencies"
