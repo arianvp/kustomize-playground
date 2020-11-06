@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: prometheus
+spec:
+  serviceAccountName: prometheus
+  serviceMonitorSelector:
+    matchLabels:
+      team: arianvp
+  storage:
+    volumeClaimTemplate:
+      spec:
+        storageClassName: "local-path"
+        resources:
+          requests:
+            storage: 10Gi
+
+  resources:
+    requests:
+      memory: 400M

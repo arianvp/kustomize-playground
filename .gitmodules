@@ -1,0 +1,12 @@
+[submodule "controllers/prometheus-operator"]
+	path = controllers/prometheus-operator
+	url = git@github.com:prometheus-operator/prometheus-operator
+[submodule "controllers/local-path-provisioner"]
+	path = controllers/local-path-provisioner
+	url = git@github.com:rancher/local-path-provisioner
+[submodule "controllers/minio-operator"]
+	path = controllers/minio-operator
+	url = git@github.com:minio/minio-operator
+[submodule "controllers/ingress-nginx"]
+	path = controllers/ingress-nginx
+	url = git@github.com:kubernetes/ingress-nginx
