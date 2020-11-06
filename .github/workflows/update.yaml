@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - uses: cachix/install-nix-action@v9
       - run: nix run -f ./nix niv -c niv update
         env:
@@ -24,7 +26,7 @@ jobs:
           done
       - uses: peter-evans/create-pull-request@v2.8.0
         with:
-          token: ${{ secrets.PAT }} # needed so that this triggers further flows. not ideal:
+          # token: ${{ secrets.PAT }} # needed so that this triggers further flows. not ideal:
           commit-message: "chore: update dependencies"
           title: "chore: update dependencies"
           reviewers: "arianvp"
