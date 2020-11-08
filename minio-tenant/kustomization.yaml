@@ -7,5 +7,5 @@ configurations:
 secretGenerator:
   - name: minio-creds-secret
     literals:
-      - accessKey=minio
-      - secretKey=minio123
+      - accesskey=minio
+      - secretkey=minio123
