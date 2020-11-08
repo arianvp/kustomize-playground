@@ -1,0 +1,61 @@
+name: "Pull request"
+on:
+  pull_request:
+jobs:
+  kind:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: cachix/install-nix-action@v9
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+        path: master 
+        ref: master
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+        path: pr 
+    - name: "Start kind cluster from master"
+      run: |
+        cd master
+        nix-shell --run "kind create cluster --name master"
+    - name: Apply manifests from master on master cluster
+      run: |
+        cd master
+        nix-shell --run "kubectl config use-context kind-master"
+        nix-shell --run "./bin/apply controllers"
+        nix-shell --run "./bin/apply ."
+
+    - name: "Start kind cluster from pr"
+      run: |
+        cd pr
+        nix-shell --run "kind create cluster --name pr"
+
+    - name: Apply manifests from pr on pr cluster
+      run: |
+        cd pr
+        nix-shell --run "kubectl config use-context kind-pr"
+        nix-shell --run "./bin/apply controllers"
+        nix-shell --run "./bin/apply ."
+
+    - name: "Make sure all pr pods are healthy"
+      run: |
+        nix-shell --run "kubectl config use-context kind-pr"
+        nix-shell --run "kubectl wait -all-namespaces --for=condition=Ready pods --all --timeout=120s"
+
+    - name: "Apply manifests from pr on master cluster (Upgrade)"
+      run: |
+        cd pr
+        nix-shell --run "kubectl config use-context kind-master"
+        nix-shell --run "./bin/apply controllers"
+        nix-shell --run "./bin/apply ."
+
+    - name: "Make sure all master pods are healthy"
+      run: |
+        nix-shell --run "kubectl config use-context kind-master"
+        nix-shell --run "kubectl wait -all-namespaces --for=condition=Ready pods --all --timeout=120s"
+
+    
+
+
+ 
