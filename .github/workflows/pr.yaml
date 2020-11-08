@@ -40,8 +40,11 @@ jobs:
 
     - name: "Make sure all pr pods are healthy"
       run: |
+        cd pr
         nix-shell --run "kubectl config use-context kind-pr"
-        nix-shell --run "kubectl wait -all-namespaces --for=condition=Ready pods --all --timeout=120s"
+        nix-shell --run "kubectl wait --all-namespaces --for=condition=Ready pods --all --timeout=120s"
+        nix-shell --run "kubectl get pods --all-namespaces"
+
 
     - name: "Apply manifests from pr on master cluster (Upgrade)"
       run: |
@@ -52,10 +55,7 @@ jobs:
 
     - name: "Make sure all master pods are healthy"
       run: |
+        cd pr
         nix-shell --run "kubectl config use-context kind-master"
-        nix-shell --run "kubectl wait -all-namespaces --for=condition=Ready pods --all --timeout=120s"
-
-    
-
-
- 
+        nix-shell --run "kubectl wait --all-namespaces --for=condition=Ready pods --all --timeout=120s"
+        nix-shell --run "kubectl get pods --all-namespaces"
