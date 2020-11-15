@@ -1,0 +1,32 @@
+brig:
+  host: 0.0.0.0
+  port: 8080
+cassandra:
+  endpoint:
+    host: cassandra
+    port: 9024
+  keyspace: brig
+elasticsearch:
+  url: http://elasticsearch:9200
+  index: directory
+cargohold: http://cargohold
+gundeck: http://gundeck
+aws:
+  prekeyTable: prekeys
+  sqsEndpoint: sqs
+  dynamoDBEndpoint: dynamodb
+internalEvents:
+  queueType: sqs
+  queeName: ""
+turn: 
+
+# Now comes a whole section with concerns that shouldn't be brigs'.
+# Why is brig a content template engine? This should ideally be parts of
+# accounts/team-settings
+emailSMS:
+  email:
+    smtpEndpoint:
+      host: smtp
+      port: 25
+    smtpConnType: plain
+

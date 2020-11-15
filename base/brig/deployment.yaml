@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: brig
+spec:
+  selector:
+    matchLabels:
+      app: brig
+  template:
+    metadata:
+      labels:
+        app: brig
+    spec:
+      volumes:
+        - name: brig-config
+          configMap:
+            name: "brig"
+        - name: turn-config
+          configMap:
+            name: "turn"
+        - name: brig-secret
+          secret:
+            secretName: brig
+      containers:
+        - name: brig
+          image: quay.io/wire/brig
+          volumeMounts:
+            - mountPath: /etc/brig
+              name: brig-config
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+              

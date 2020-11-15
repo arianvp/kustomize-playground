@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cannon
+spec:
+  serviceName: cannon
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cannon
+  template:
+    metadata:
+      labels:
+        app: cannon
+    spec:
+      volumes:
+        - name: cannon
+          configMap:
+            name: cannon
+        - name: externalhost
+          emptDir:
+      initContainers:
+        - name: fqdn
+          image: alpine
+          command: [/bin/sh]
+          args: [-c, hostname -f > /etc/wire/cannon/externalHost/host]
+          volumeMounts:
+            - mountPath: /etc/wire/cannon/externalHost
+              name: externalhost
+      containers:
+        - name: cannon
+          image: quay.io/wire/cannon
+          volumeMounts:
+            - mountPath: /etc/wire/cannon/conf
+              name: cannon
+            - mountPath: /etc/wire/cannon/externalHost
+              name: externalhost
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080

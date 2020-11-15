@@ -1,0 +1,22 @@
+logLevel: Info
+gundeck: { host: 0.0.0.0, port: 8080 }
+cassandra:
+  endpoint: { host: cassandra, port: 9042 }
+  keyspace: gundeck
+redis: { host: redis-master, port: 6379 }
+aws:
+  queueName: gundeck-events
+  region: eu-west-1
+  account: "123456789012" # Default account nr used by localstack
+  arnEnv: integration
+  sqsEndpoint: http://localstack:4566
+  snsEndpoint: http://localstack:4566
+settings:
+  httpPoolSize: 1024
+  notificationTTL: 24192200
+  bulkPush: true
+  perNativePushConcurrency: 32
+  sqsThrottleMillis: 1000
+  maxConcurrentNativePushes:
+    hard: 30  # more than this number of threads will not be allowed
+    soft: 10  # more than this number of threads will be warned about

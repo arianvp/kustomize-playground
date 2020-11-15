@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gundeck
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: gundeck
+  template:
+    metadata:
+      labels:
+        app: gundeck
+    spec:
+      volumes:
+        - name: gundeck
+          configMap:
+            name: gundeck
+      initContainers:
+        - name: sqs-queue
+          image: mesosphere/aws-cli
+          command: [/bin/sh]
+          args:
+            - -c
+            - |
+              aws configure set region us-east-1
+              aws configure set aws_access_key_id dummykey
+              aws configure set aws_secret_access_key dummysecret
+              aws --endpoint-url=http://localstack:4566 sqs  create-queue --queue-name gundeck-events || true
+
+        - name: gundeck-schema
+          image: quay.io/wire/gundeck-schema
+          args:
+            - --host
+            - cassandra
+            - --port
+            - "9042"
+            - --keyspace
+            - gundeck
+            - --replication-factor
+            - "1"
+      containers:
+        - name: gundeck
+          image: quay.io/wire/gundeck
+          volumeMounts:
+            - mountPath: /etc/wire/gundeck/conf
+              name: gundeck
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              value: "dummykey"
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "dummysecret"
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080

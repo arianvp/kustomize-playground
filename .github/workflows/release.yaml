@@ -1,0 +1,12 @@
+on:
+  release:
+jobs:
+  install-release:
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+  # Check if you can upgrade from the previous release
+  upgrade-release:
+    runs-on: ubuntu-latest
